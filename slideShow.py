@@ -37,8 +37,8 @@ class Root(tk.Tk):
         self.boolean = True
 
         self.getImages()
-        self.video = videoPlayer.Player(self, video=self.getVideos())
-
+        self.video = videoPlayer.Player(self)
+        self.video.play(self.getVideos())
         self.video.pack(fill="both", expand=True)
 
         self.startSlideShow(delay)
