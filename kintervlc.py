@@ -25,8 +25,6 @@ Requires Python 3.4 or later.
 Author: Patrick Fay
 Date: 23-09-2015
 """
-import os
-os.add_dll_directory(r'C:\Program Files (x86)\VideoLAN\VLC')
 # Tested with Python 3.7.4, tkinter/Tk 8.6.9 on macOS 10.13.6 only.
 __version__ = '19.07.29'  # mrJean1 at Gmail dot com
 
@@ -326,6 +324,7 @@ class Player(Tk.Frame):
                 # macOS, covering the buttons, sliders, etc.
                 # XXX 2) .winfo_id() to return NSView on macOS?
                 v = _GetNSView(h)
+                print(v)
                 if v:
                     self.player.set_nsobject(v)
                 else:

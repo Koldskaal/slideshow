@@ -1,9 +1,11 @@
 import os
-os.add_dll_directory(r'C:\Program Files (x86)\VideoLAN\VLC')
+# os.add_dll_directory(r'C: \Program Files (x86)\VideoLAN\VLC')
 
 import vlc
 import sys
 import time
+
+
 
 from os.path import basename, expanduser, isfile, join as joined
 
@@ -14,6 +16,41 @@ playing = set([1,2,3,4])
 _isMacOS   = sys.platform.startswith('darwin')
 _isWindows = sys.platform.startswith('win')
 _isLinux = sys.platform.startswith('linux')
+
+if _isMacOS:
+    from ctypes import c_void_p, cdll
+    # libtk = cdll.LoadLibrary(ctypes.util.find_library('tk'))
+    # returns the tk library /usr/lib/libtk.dylib from macOS,
+    # but we need the tkX.Y library bundled with Python 3+,
+    # to match the version number of tkinter, _tkinter, etc.
+    try:
+        libtk = 'libtk%s.dylib' % (Tk.TkVersion,)
+        libtk = joined(sys.prefix, 'lib', libtk)
+        dylib = cdll.LoadLibrary(libtk)
+        # getNSView = dylib.TkMacOSXDrawableView is the
+        # proper function to call, but that is non-public
+        # (in Tk source file macosx/TkMacOSXSubwindows.c)
+        # and dylib.TkMacOSXGetRootControl happens to call
+        # dylib.TkMacOSXDrawableView and return the NSView
+        _GetNSView = dylib.TkMacOSXGetRootControl
+        # C signature: void *_GetNSView(void *drawable) to get
+        # the Cocoa/Obj-C NSWindow.contentView attribute, the
+        # drawable NSView object of the (drawable) NSWindow
+        _GetNSView.restype = c_void_p
+        _GetNSView.argtypes = c_void_p,
+        del dylib
+
+    except (NameError, OSError):  # image or symbol not found
+        def _GetNSView(unused):
+            return None
+        libtk = "N/A"
+
+    C_Key = "Command-"  # shortcut key modifier
+
+else:  # *nix, Xwindows and Windows, UNTESTED
+
+    libtk = "N/A"
+    C_Key = "Control-"  # shortcut key modifier
 
 
 # time.sleep(5) #Give it time to get going
