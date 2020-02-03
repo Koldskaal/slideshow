@@ -316,6 +316,7 @@ class Player(Tk.Frame):
 
             # set the window id where to render VLC's video output
             h = self.videopanel.winfo_id()  # .winfo_visualid()?
+
             if _isWindows:
                 self.player.set_hwnd(h)
             elif _isMacOS:

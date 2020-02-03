@@ -12,13 +12,13 @@ import sys
 from PyQt5 import QtWidgets, QtGui, QtCore
 import vlc
 
-class Player(QtWidgets.QMainWindow):
-    """A simple Media Player using VLC and Qt
+class VideoPlayer(QtWidgets.QWidget):
+    """A simple Media VideoPlayer using VLC and Qt
     """
 
     def __init__(self, master=None):
-        QtWidgets.QMainWindow.__init__(self, master)
-        self.setWindowTitle("Media Player")
+        QtWidgets.QWidget.__init__(self, master)
+        self.setWindowTitle("Media VideoPlayer")
 
         # Create a basic vlc instance
         self.instance = vlc.Instance()
@@ -36,8 +36,6 @@ class Player(QtWidgets.QMainWindow):
     def create_ui(self):
         """Set up the user interface, signals & slots
         """
-        self.widget = QtWidgets.QWidget(self)
-        self.setCentralWidget(self.widget)
 
         # In this widget, the video will be drawn
         if platform.system() == "Darwin": # for MacOS
@@ -55,24 +53,24 @@ class Player(QtWidgets.QMainWindow):
         self.vboxlayout = QtWidgets.QVBoxLayout()
         self.vboxlayout.addWidget(self.videoframe)
 
-        self.widget.setLayout(self.vboxlayout)
+        self.setLayout(self.vboxlayout)
 
-        menu_bar = self.menuBar()
-
-        # File menu
-        file_menu = menu_bar.addMenu("File")
-
-        # Add actions to file menu
-        open_action = QtWidgets.QAction("Load Video", self)
-        close_action = QtWidgets.QAction("Close App", self)
-        playpause_action = QtWidgets.QAction("Play/Pause", self)
-        file_menu.addAction(open_action)
-        file_menu.addAction(close_action)
-        file_menu.addAction(playpause_action)
-
-        open_action.triggered.connect(self.open_file)
-        close_action.triggered.connect(sys.exit)
-        playpause_action.triggered.connect(self.play_pause)
+        # menu_bar = self.menuBar()
+        #
+        # # File menu
+        # file_menu = menu_bar.addMenu("File")
+        #
+        # # Add actions to file menu
+        # open_action = QtWidgets.QAction("Load Video", self)
+        # close_action = QtWidgets.QAction("Close App", self)
+        # playpause_action = QtWidgets.QAction("Play/Pause", self)
+        # file_menu.addAction(open_action)
+        # file_menu.addAction(close_action)
+        # file_menu.addAction(playpause_action)
+        #
+        # open_action.triggered.connect(self.open_file)
+        # close_action.triggered.connect(sys.exit)
+        # playpause_action.triggered.connect(self.play_pause)
 
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(100)
@@ -160,7 +158,7 @@ def main():
     """Entry point for our simple vlc player
     """
     app = QtWidgets.QApplication(sys.argv)
-    player = Player()
+    player = VideoPlayer()
     player.show()
     player.resize(640, 480)
     sys.exit(app.exec_())
