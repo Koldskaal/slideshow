@@ -1,12 +1,14 @@
 import os
 from watchdog.events import RegexMatchingEventHandler
 
-class ImagesEventHandler(RegexMatchingEventHandler):
+class FileEventHandler(RegexMatchingEventHandler):
     THUMBNAIL_SIZE = (128, 128)
-    IMAGES_REGEX = [r".*.jpg$"]
+    IMAGES_REGEX = [r".*.(gif|jpg|jpeg|tiff|png|mp4)$"]
 
-    def __init__(self):
+    def __init__(self, signal):
         super().__init__(self.IMAGES_REGEX)
+
+        self.signal = signal
 
     def on_any_event(self, event):
         self.process(event)
@@ -15,3 +17,7 @@ class ImagesEventHandler(RegexMatchingEventHandler):
         filename, ext = os.path.splitext(event.src_path)
         filename = f"{filename}_thumbnail.jpg"
         print(f"{event.src_path} + {event.event_type}")
+
+        # Send QT signal to reload files!
+        if self.signal:
+            self.signal.emit()

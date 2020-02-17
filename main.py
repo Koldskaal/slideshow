@@ -1,27 +1,29 @@
-
+import re
 import platform
 import os
 import sys
 
 from PyQt5 import QtWidgets, QtGui, QtCore
-from PIL import Image, ImageTk
 
-import videoPlayer2
+from frames import videos, images
+from watcher import WatcherThread
 
 class MainWindow(QtWidgets.QMainWindow):
+    finished = QtCore.pyqtSignal()
+
     def __init__(self, master=None):
         QtWidgets.QMainWindow.__init__(self, master)
 
-        self.setWindowTitle("Image viewer")
+        self.files = []
+        self.index = 0
+
+
+        self.setWindowTitle("Slideshow")
 
         self.palette = self.palette()
         self.palette.setColor(QtGui.QPalette.Window, QtGui.QColor(0, 0, 0))
 
         self.setPalette(self.palette)
-
-        self.image_viewer = ImageViewer(self)
-
-        self.setCentralWidget(self.image_viewer)
 
         self.ranbool = True
 
@@ -34,6 +36,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.vboxlayout = QtWidgets.QVBoxLayout()
         self.vboxlayout.addWidget(self.videoframe)
 
+        self.watcher_thread = WatcherThread()
+        self.watcher_thread.refresh.connect(self.generate_list)
+
+        self.watcher_thread.start()
+
         #self.central_widget.setLayout(self.vboxlayout)
 
         self.showFullScreen()
@@ -42,32 +49,33 @@ class MainWindow(QtWidgets.QMainWindow):
 
         g_shortcut.activated.connect(self.get_next)
 
+        self.finished.connect(self.get_next)
+
+        self.generate_list()
+
     def get_next(self):
-        if self.ranbool:
-            self.ranbool = False
-            self.setCentralWidget(ImageViewer(self))
+
+        if self.index >= len(self.files):
+            self.index = 0
+
+        path = self.files[self.index]
+
+        if re.match(r".*.(gif|jpg|jpeg|tiff|png)$", path):
+            self.setCentralWidget(images.ImageViewer(self, path=path))
         else:
-            self.ranbool = True
-            self.setCentralWidget(videoPlayer2.VideoPlayer(self))
+            self.setCentralWidget(videos.VideoPlayer(self, path=path))
 
-class ImageViewer(QtWidgets.QWidget):
-    """A simple Image displayer
-    """
-
-    def __init__(self, master=None):
-        QtWidgets.QWidget.__init__(self, master)
+        self.index += 1
 
 
-        label = QtWidgets.QLabel(self)
-        pixmap = QtGui.QPixmap('dog-landing-hero-lg.jpg')
-        label.setPixmap(pixmap)
-        label.setAlignment(QtCore.Qt.AlignCenter)
+    def generate_list(self):
+        self.files = [f for f in os.listdir('.') if re.match(r".*.(gif|jpg|jpeg|tiff|png|mp4)$", f)]
+
+        self.index = 0
+
+        self.get_next()
 
 
-        lay = QtWidgets.QVBoxLayout()
-        lay.addWidget(label)
-
-        self.setLayout(lay)
 
 def main():
     """Entry point for our simple vlc player
