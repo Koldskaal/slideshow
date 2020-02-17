@@ -1,10 +1,3 @@
-"""
-A simple example for VLC python bindings using PyQt5.
-
-Author: Saveliy Yusufov, Columbia University, sy2685@columbia.edu
-Date: 25 December 2018
-"""
-
 import platform
 import os
 import sys
@@ -13,12 +6,9 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 import vlc
 
 class VideoPlayer(QtWidgets.QWidget):
-    """A simple Media VideoPlayer using VLC and Qt
-    """
 
     def __init__(self, master=None, path=None):
         QtWidgets.QWidget.__init__(self, master)
-        self.setWindowTitle("Media VideoPlayer")
 
         self.master = master
 
@@ -29,12 +19,13 @@ class VideoPlayer(QtWidgets.QWidget):
 
         # Create an empty vlc media player
         self.mediaplayer = self.instance.media_player_new()
+        self.mediaplayer.audio_set_mute(1)
 
         self.create_ui()
         self.is_paused = False
 
         self.showFullScreen()
-        
+
         self._play(path)
 
     def create_ui(self):
@@ -80,7 +71,7 @@ class VideoPlayer(QtWidgets.QWidget):
             self.is_paused = False
 
     def stop(self):
-        """Stop player
+        """Stop player and tell master it is done
         """
         self.mediaplayer.stop()
         self.master.finished.emit()
@@ -108,41 +99,9 @@ class VideoPlayer(QtWidgets.QWidget):
         elif platform.system() == "Darwin": # for MacOS
             self.mediaplayer.set_nsobject(int(self.videoframe.winId()))
 
-        self.play_pause()
-
-    def open_file(self):
-        """Open a media file in a MediaPlayer
-        """
-
-        dialog_txt = "Choose Media File"
-        filename = QtWidgets.QFileDialog.getOpenFileName(self, dialog_txt, os.path.expanduser('~'))
-        if not filename:
-            return
-
-        # getOpenFileName returns a tuple, so use only the actual file name
-        self.media = self.instance.media_new(filename[0])
-
-        # Put the media in the media player
-        self.mediaplayer.set_media(self.media)
-
-        # Parse the metadata of the file
-        self.media.parse()
-
-        # Set the title of the track as window title
-        self.setWindowTitle(self.media.get_meta(0))
-
-        # The media player has to be 'connected' to the QFrame (otherwise the
-        # video would be displayed in it's own window). This is platform
-        # specific, so we must give the ID of the QFrame (or similar object) to
-        # vlc. Different platforms have different functions for this
-        if platform.system() == "Linux": # for Linux using the X Server
-            self.mediaplayer.set_xwindow(int(self.videoframe.winId()))
-        elif platform.system() == "Windows": # for Windows
-            self.mediaplayer.set_hwnd(int(self.videoframe.winId()))
-        elif platform.system() == "Darwin": # for MacOS
-            self.mediaplayer.set_nsobject(int(self.videoframe.winId()))
-
-        self.play_pause()
+        self.mediaplayer.play()
+        self.timer.start()
+        self.is_paused = False
 
     def set_volume(self, volume):
         """Set the volume

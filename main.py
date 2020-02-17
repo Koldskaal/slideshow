@@ -17,7 +17,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.files = []
         self.index = 0
 
+        cursor = QtGui.QCursor(QtCore.Qt.BlankCursor)
 
+        self.setCursor(cursor)
         self.setWindowTitle("Slideshow")
 
         self.palette = self.palette()
