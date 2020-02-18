@@ -17,6 +17,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.files = []
         self.index = 0
 
+        self.src_path = sys.argv[1] if len(sys.argv) > 1 else '.'
+
         cursor = QtGui.QCursor(QtCore.Qt.BlankCursor)
 
         self.setCursor(cursor)
@@ -64,14 +66,14 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if re.match(r".*.(gif|jpg|jpeg|tiff|png)$", path):
             self.setCentralWidget(images.ImageViewer(self, path=path))
-        else:
+        elif re.match(r".*.(mp4|qtff|mov)$", path):
             self.setCentralWidget(videos.VideoPlayer(self, path=path))
 
         self.index += 1
 
 
     def generate_list(self):
-        self.files = [f for f in os.listdir('.') if re.match(r".*.(gif|jpg|jpeg|tiff|png|mp4)$", f)]
+        self.files = [f for f in os.listdir(self.src_path) if re.match(r".*.(gif|jpg|jpeg|tiff|png|mp4|qtff|mov)$", f)]
 
         self.index = 0
 

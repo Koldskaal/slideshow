@@ -3,7 +3,7 @@ from watchdog.events import RegexMatchingEventHandler
 
 class FileEventHandler(RegexMatchingEventHandler):
     THUMBNAIL_SIZE = (128, 128)
-    IMAGES_REGEX = [r".*.(gif|jpg|jpeg|tiff|png|mp4)$"]
+    IMAGES_REGEX = [r".*.(gif|jpg|jpeg|tiff|png)$", r".*.(mp4|qtff|mov)$"]
 
     def __init__(self, signal):
         super().__init__(self.IMAGES_REGEX)
