@@ -62,7 +62,8 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.index >= len(self.files):
             self.index = 0
 
-        path = self.files[self.index]
+        path = self.src_path + "/" + self.files[self.index]
+        print(path)
 
         if re.match(r".*.(gif|jpg|jpeg|tiff|png)$", path):
             self.setCentralWidget(images.ImageViewer(self, path=path))
@@ -74,7 +75,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def generate_list(self):
         self.files = [f for f in os.listdir(self.src_path) if re.match(r".*.(gif|jpg|jpeg|tiff|png|mp4|qtff|mov)$", f)]
-
         self.index = 0
 
         self.get_next()
